@@ -16,7 +16,7 @@ import json
 
 key_dict = json.loads(st.secrets["textkey"])
 creds = service_account.Credentials.from_service_account_info(key_dict)
-db = firestore.Client(credentials=creds, project="names-project-demo")
+db = firestore.client(credentials=creds, project="names-project-demo")
 
 dbNames = db.collection("names")
 st.header("Nuevo registro")
@@ -24,8 +24,8 @@ st.header("Nuevo registro")
 index = st.text_input("index")
 name = st.text_input("Name")
 sex = st.selectbox(
-    "Select Sex",
-    ("F", "M", "Other")
+    'Select Sex',
+    ('F', 'M', 'Other')
 )
 
 submit = st.button("Crear nuevo registro")
@@ -46,9 +46,9 @@ sidebar.write("Registro insertado correctamente")
 
 
 def loadByName(name):
-    names_ref = dbNames.where("name", "==", name).stream()
+    names_ref = dbNames.where(u"name", u"==", name)
     currentName = None
-    for myname in names_ref:
+    for myname in names_ref.stream():
         currentName = myname
     return currentName
 
@@ -64,7 +64,7 @@ if btnFiltrar:
     else:
         sidebar.write(doc.to_dict())
 
-sidebar.markdown("---")
+sidebar.markdown("""---""")
 
 btnEliminar = sidebar.button("Eliminar")
 
@@ -76,7 +76,7 @@ if btnEliminar:
         dbNames.document(deletename.id).delete()
         sidebar.write(f"{nameSearch} eliminado")
 
-sidebar.markdown("---")
+sidebar.markdown("""---""")
 newname = sidebar.text_input("Actualizar nombre")
 btnActualizar = sidebar.button("Actualizar")
 
@@ -86,9 +86,9 @@ if btnActualizar:
         st.write(f"{nameSearch} no existe")
     else:
         myupdatename = dbNames.document(updatename.id)
-        myupdatename.set({"name": newname}, merge=True)
+        myupdatename.update({"name": newname}, merge=True)
 
-names_ref = db.collection("names").stream()
-names_dict = [name.to_dict() for name in names_ref]
+names_ref = list(db.collection(u"names").stream())
+names_dict = list(map(lambda x: x.to_dict(), names_ref))
 names_dataframe = pd.DataFrame(names_dict)
 st.dataframe(names_dataframe)
