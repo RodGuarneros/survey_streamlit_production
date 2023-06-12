@@ -16,7 +16,7 @@ import json
 
 key_dict = json.loads(st.secrets["textkey"])
 creds = service_account.Credentials.from_service_account_info(key_dict)
-db = firestore.client(credentials=creds, project="names-project-demo")
+db = firestore.Client(credentials=creds, project="names-project-demo")
 
 dbNames = db.collection("names")
 st.header("Nuevo registro")
