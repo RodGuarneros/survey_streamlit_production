@@ -33,63 +33,62 @@ submit = st.button("Crear nuevo registro")
 # Una vez que el nombre es enviado, subir a la base de datos
 
 if index and name and sex and submit:
-  doc_ref = db.collection("names").document(name)
-  doc_ref.set({
-      "index": index,
-      "name": name,
-      "sex": sex
-  })
+    doc_ref = db.collection("names").document(name)
+    doc_ref.set({
+        "index": index,
+        "name": name,
+        "sex": sex
+    })
 
 sidebar = st.sidebar
 
 sidebar.write("Registro insertado correctamente")
 
+
 def loadByName(name):
-  names_ref = dbNames.where(u"name", u"==", name)
-  currentName = None
-  for myname in names_ref.stream():
-    currentName = myname
-  return currentName
+    names_ref = dbNames.where("name", "==", name).stream()
+    currentName = None
+    for myname in names_ref:
+        currentName = myname
+    return currentName
+
 
 sidebar.subheader("Buscar nombre")
 nameSearch = sidebar.text_input("nombre")
 btnFiltrar = sidebar.button("Buscar")
 
 if btnFiltrar:
-  doc = loadByName(nameSearch)
-  if doc is None:
-    sidebar.write("El nombre no existe")
-  else:
-    sidebar.write(doc.to_dict())
+    doc = loadByName(nameSearch)
+    if doc is None:
+        sidebar.write("El nombre no existe")
+    else:
+        sidebar.write(doc.to_dict())
 
-sidebar.markdown("""---""")
+sidebar.markdown("---")
 
 btnEliminar = sidebar.button("Eliminar")
 
 if btnEliminar:
-  deletename = loadByName(nameSearch)
-  if deletename is None:
-    sidebar.write(f"{nameSearch} no existe")
-  else:
-    dbNames.document(deletename.id).delete()
-    sidebar.write(f("{nameSearch} eliminado"))
+    deletename = loadByName(nameSearch)
+    if deletename is None:
+        sidebar.write(f"{nameSearch} no existe")
+    else:
+        dbNames.document(deletename.id).delete()
+        sidebar.write(f"{nameSearch} eliminado")
 
-sidebar.markdown("""---""")
+sidebar.markdown("---")
 newname = sidebar.text_input("Actualizar nombre")
 btnActualizar = sidebar.button("Actualizar")
 
-if btnActualizar: 
-  updatename = loadByName(nameSearch)
-  if updatename is None:
-    st.write(f"{nameSearch} no existe")
-  else:
-    myupdatename = dbNames.document(updatename.id)
-    myupdatename(
-        {
-            "name":newname
-        }
-    )
-names_ref = list(db.collection(u'names').stream())
-names_dict = list(map(lambda x: x.to_dict(), names_ref))
+if btnActualizar:
+    updatename = loadByName(nameSearch)
+    if updatename is None:
+        st.write(f"{nameSearch} no existe")
+    else:
+        myupdatename = dbNames.document(updatename.id)
+        myupdatename.set({"name": newname}, merge=True)
+
+names_ref = db.collection("names").stream()
+names_dict = [name.to_dict() for name in names_ref]
 names_dataframe = pd.DataFrame(names_dict)
 st.dataframe(names_dataframe)
