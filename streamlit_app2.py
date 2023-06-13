@@ -21,7 +21,7 @@ db = firestore.Client(credentials=creds, project="names-project-demo")
 dbNames = db.collection("names")
 st.header("Nuevo registro")
 
-index = st.text_input("index")
+index = st.text_input("Index")
 name = st.text_input("Name")
 sex = st.selectbox(
     'Select Sex',
