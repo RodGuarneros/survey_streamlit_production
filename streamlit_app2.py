@@ -86,7 +86,7 @@ if btnActualizar:
         st.write(f"{nameSearch} no existe")
     else:
         myupdatename = dbNames.document(updatename.id)
-        myupdatename.update({"name": newname}, merge=True)
+        myupdatename.update({"name": newname})
 
 names_ref = list(db.collection("names").stream())
 names_dict = list(map(lambda x: x.to_dict(), names_ref))
