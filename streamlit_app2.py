@@ -16,7 +16,7 @@ import json
 
 key_dict = json.loads(st.secrets["textkey"])
 creds = service_account.Credentials.from_service_account_info(key_dict)
-db = firestore.Client(credentials=creds, project="names-project-demo")
+db = firestore.Client(credentials=creds, project="names-project-demo-d5aaf")
 
 dbNames = db.collection("names")
 st.header("Nuevo registro")
@@ -88,7 +88,7 @@ if btnActualizar:
         myupdatename = dbNames.document(updatename.id)
         myupdatename.update({"name": newname}, merge=True)
 
-names_ref = list(db.collection(u"names").stream())
+names_ref = list(db.collection("names").stream())
 names_dict = list(map(lambda x: x.to_dict(), names_ref))
 names_dataframe = pd.DataFrame(names_dict)
 st.dataframe(names_dataframe)
